@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="root" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.MainController">
+   <children>
+      <BorderPane fx:id="root_bp">
+         <top>
+            <HBox alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label fx:id="rootFolder_lab" text="Label">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Button mnemonicParsing="false" onMouseClicked="#clickOnRootFolder" style="-fx-background-color: lightgreen; -fx-background-radius: 20;" text="RootFolder" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <BorderPane.margin>
+                  <Insets left="10.0" top="10.0" />
+               </BorderPane.margin>
+            </HBox>
+         </top>
+         <bottom>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <VBox>
+                     <children>
+                        <CheckBox mnemonicParsing="false" text="Копировать exe в выбранную папку" />
+                        <HBox>
+                           <children>
+                              <Label text="Label" />
+                              <Button mnemonicParsing="false" text="newFolder" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <CheckBox fx:id="launch_cb" mnemonicParsing="false" text="Launch" />
+                  <Button mnemonicParsing="false" onMouseClicked="#clickOnStart" text="Start" />
+               </children>
+            </VBox>
+         </bottom>
+         <center>
+            <HBox BorderPane.alignment="CENTER">
+               <children>
+                  <ScrollPane>
+                     <content>
+                        <TreeView fx:id="treeFiles_tv" />
+                     </content>
+                  </ScrollPane>
+                  <Pane>
+                     <children>
+                        <Button mnemonicParsing="false" onMouseClicked="#clickOnRefreshFiles" text="RefreshFiles" />
+                     </children></Pane>
+               </children>
+            </HBox>
+         </center>
+      </BorderPane>
+   </children>
+</Pane>
