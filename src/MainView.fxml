@@ -60,10 +60,21 @@
                         <TreeView fx:id="treeFiles_tv" />
                      </content>
                   </ScrollPane>
-                  <Pane>
+                  <VBox fx:id="output_root">
                      <children>
-                        <Button mnemonicParsing="false" onMouseClicked="#clickOnRefreshFiles" text="RefreshFiles" />
-                     </children></Pane>
+                        <Button fx:id="refreshFiles_but" mnemonicParsing="false" onMouseClicked="#clickOnRefreshFiles" text="RefreshFiles" />
+                        <ScrollPane fx:id="error_root" style="-fx-background-color: red;">
+                           <content>
+                              <VBox fx:id="errorMessages_root" />
+                           </content>
+                        </ScrollPane>
+                        <ScrollPane fx:id="console_root" style="-fx-background-color: green;">
+                           <content>
+                              <VBox fx:id="consoleMessages_root" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </VBox>
                </children>
             </HBox>
          </center>
