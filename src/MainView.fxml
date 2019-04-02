@@ -3,8 +3,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -18,12 +21,12 @@
          <top>
             <HBox alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label fx:id="rootFolder_lab" text="Label">
+                  <Label fx:id="catalogPath_lab" text="Label">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Button mnemonicParsing="false" onMouseClicked="#clickOnRootFolder" style="-fx-background-color: lightgreen; -fx-background-radius: 20;" text="RootFolder" />
+                  <Button mnemonicParsing="false" onMouseClicked="#clickOnRootFolder" style="-fx-background-color: lightgreen; -fx-background-radius: 20;" text="find catalog" />
                </children>
                <opaqueInsets>
                   <Insets />
@@ -36,26 +39,102 @@
          <bottom>
             <VBox BorderPane.alignment="CENTER">
                <children>
+                  <HBox>
+                     <children>
+                        <Button mnemonicParsing="false" onMouseClicked="#clickOnFindErrors" text="Find errors" />
+                        <Button mnemonicParsing="false" onMouseClicked="#clickOnClearWarnings" text="clear warnings" />
+                        <Button mnemonicParsing="false" onMouseClicked="#clickOnClearConsole" text="clear console" />
+                     </children>
+                  </HBox>
                   <VBox>
                      <children>
-                        <CheckBox mnemonicParsing="false" text="Копировать exe в выбранную папку" />
-                        <HBox>
+                        <VBox fx:id="settings_original_root">
                            <children>
-                              <Label text="Label" />
-                              <Button mnemonicParsing="false" text="newFolder" />
+                              <Label text="Original name" />
+                              <HBox>
+                                 <children>
+                                    <TextField fx:id="settings_nameOriginal_tf" />
+                                    <Label fx:id="settings_counterOriginal_lab" />
+                                    <Label text=".exe" />
+                                    <VBox>
+                                       <children>
+                                          <CheckBox fx:id="settings_counterOriginal_cb" mnemonicParsing="false" text="Counter" />
+                                          <VBox>
+                                             <children>
+                                                <ComboBox fx:id="settings_counterOriginalType_cb" />
+                                                <HBox>
+                                                   <children>
+                                                      <Label text="Last value" />
+                                                      <TextField fx:id="settings_counterOriginalLastValue_tf" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </VBox>
+                                    <Button mnemonicParsing="false" onMouseClicked="#clickOnAutogenerateName_original" text="autogenerate" />
+                                 </children>
+                              </HBox>
                            </children>
-                        </HBox>
+                        </VBox>
+                        <CheckBox fx:id="settings_notSaveInThisCatalog_cb" mnemonicParsing="false" text="do not save in this catalog" />
+                     </children></VBox>
+                  <VBox>
+                     <children>
+                        <CheckBox fx:id="settings_createCopy_cb" mnemonicParsing="false" text="Create copy .exe" />
+                        <VBox fx:id="settings_copied_root">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Label fx:id="settings_catalogCopiedPath_lab" text="pathCopied" />
+                                    <Button mnemonicParsing="false" onMouseClicked="#clickOnOpenPathCopiedCatalog" text="find catalog for copy" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <TextField fx:id="settings_nameCopied_tf" />
+                                    <Label text=".exe" />
+                                    <VBox>
+                                       <children>
+                                          <CheckBox fx:id="settings_counterCopied_cb" mnemonicParsing="false" text="Counter" />
+                                          <VBox fx:id="settings_counterCopied_root">
+                                             <children>
+                                                <ComboBox fx:id="settings_counterCopiedType_cb" />
+                                                <HBox>
+                                                   <children>
+                                                      <Label text="Last value" />
+                                                      <TextField fx:id="settings_counterCopiedLastValue_tf" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                       </children></VBox>
+                                    <VBox>
+                                       <children>
+                                          <Button mnemonicParsing="false" onMouseClicked="#clickOnAutogenerateName_copied" text="Autogenerate" />
+                                          <Button mnemonicParsing="false" onMouseClicked="#clickOnLikeTheOriginal_copied" text="like the original" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
                      </children>
                   </VBox>
-                  <CheckBox fx:id="launch_cb" mnemonicParsing="false" text="Launch" />
-                  <Button mnemonicParsing="false" onMouseClicked="#clickOnStart" text="Start" />
+                  <HBox>
+                     <children>
+                        <CheckBox fx:id="settings_launch_cb" mnemonicParsing="false" text="Launch" />
+                        <CheckBox fx:id="settings_launchCopy_cb" mnemonicParsing="false" text="Launch copy" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" onMouseClicked="#clickOnCompile" text="Compile" />
                </children>
             </VBox>
          </bottom>
          <center>
             <HBox BorderPane.alignment="CENTER">
                <children>
-                  <ScrollPane>
+                  <ScrollPane fx:id="treeFiles_root_sp" vbarPolicy="ALWAYS">
                      <content>
                         <TreeView fx:id="treeFiles_tv" />
                      </content>
@@ -63,11 +142,7 @@
                   <VBox fx:id="output_root">
                      <children>
                         <Button fx:id="refreshFiles_but" mnemonicParsing="false" onMouseClicked="#clickOnRefreshFiles" text="RefreshFiles" />
-                        <ScrollPane fx:id="error_root" style="-fx-background-color: red;">
-                           <content>
-                              <VBox fx:id="errorMessages_root" />
-                           </content>
-                        </ScrollPane>
+                        <ScrollPane fx:id="error_root" style="-fx-background-color: red;" />
                         <ScrollPane fx:id="console_root" style="-fx-background-color: green;">
                            <content>
                               <VBox fx:id="consoleMessages_root" />

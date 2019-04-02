@@ -23,6 +23,15 @@ public class Console {
         }
     }
 
+    public void exec_createExe(String pathSource, String pathResult) {
+        // " + path + file_name +"  -o " + path + file_name_sh + ".exe
+        exec("i686-w64-mingw32-gcc " + pathSource + " -o " + pathResult);
+    }
+
+    public void exec_launch(String path) {
+        exec("wine " + path);
+    }
+
     private String createAnswer() {
         if (process != null) {
             InputStream is = process.getInputStream();
@@ -67,5 +76,6 @@ public class Console {
     }
 
     public void close() {
+        process.destroy();
     }
 }
