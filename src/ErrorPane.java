@@ -92,4 +92,8 @@ public class ErrorPane extends VBox {
         }
     }
 
+    public void clear() {
+        getChildren().clear();
+    }
+
 }

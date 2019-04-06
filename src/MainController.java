@@ -458,15 +458,15 @@ public class MainController implements Initializable {
     }
 
     public void clickOnFindErrors() {
-        System.out.println("findErrors");
+        findDisplayError();
     }
 
     public void clickOnClearWarnings() {
-        System.out.println("clearWarnings");
+        errorPane.clear();
     }
 
     public void clickOnClearConsole() {
-        System.out.println("clearConsole");
+        consoleMessages_root.getChildren().clear();
     }
 
     public void clickOnAutogenerateName_original() {
