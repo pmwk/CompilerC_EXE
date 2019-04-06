@@ -21,12 +21,12 @@ public class Configuration implements Serializable {
             e.printStackTrace();
         }
     }
-
     public static void save() {
         try {
             FileOutputStream fos = new FileOutputStream(FILE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(configuration);
+            System.out.println("тип сохранили");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -34,15 +34,33 @@ public class Configuration implements Serializable {
         }
     }
 
+    private Settings settings;
+
     private static Configuration configuration;
 
     private Configuration() {
-
+        settings = new Settings();
     }
 
-    private String lastFolder;
+    public static Settings getSettings() {
+        if (configuration == null) {
+            configuration = new Configuration();
+        }
 
-    public static String getLastFolder() {
+        return configuration.settings;
+    }
+
+    public static void setSettings(Settings settings) {
+        if (configuration == null) {
+            configuration = new Configuration();
+        }
+        configuration.settings = settings;
+        save();
+    }
+
+    //private String lastFolder;
+
+    /*public static String getLastFolder() {
         if (configuration == null) {
             return null;
         } else {
@@ -56,5 +74,5 @@ public class Configuration implements Serializable {
         }
         configuration.lastFolder = lastFolder;
         save();
-    }
+    }*/
 }

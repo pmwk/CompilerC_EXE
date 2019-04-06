@@ -71,6 +71,10 @@ public class MainController implements Initializable {
     TextField settings_counterCopiedLastValue_tf;
     @FXML
     ComboBox<String> settings_counterCopiedType_cb;
+    @FXML
+    CheckBox settings_deleteOldOriginal_cb;
+    @FXML
+    CheckBox settings_deleteOldCopied_cb;
 
     @FXML
     Label catalogPath_lab;
@@ -130,7 +134,7 @@ public class MainController implements Initializable {
             if (!catalog.exists()) {
                 errorPane.addNotification("This catalog is mythical");
             } else if (!catalog.isDirectory()) {
-                errorPane.addNotification("This catalog is catalog");
+                errorPane.addNotification("This catalog is not catalog");
             } else {
                 refreshTreeFiles();
             }
@@ -151,11 +155,12 @@ public class MainController implements Initializable {
     } //этот метод выставляет все необходимы "слушатели" на различные property
 
     private void init() {
-        String catalog_lastPath = Configuration.getLastFolder();
+        /*String catalog_lastPath = Configuration.getLastFolder();
         if (catalog_lastPath == null) {
             catalog_lastPath = "No value";
         }
-        catalogProperty.setValue(catalog_lastPath); //загружаем последний исползованный путь
+        catalogProperty.setValue(catalog_lastPath); //загружаем последний исползованный путь*/
+        setSettings(Configuration.getSettings());
 
         String[] typeCounter = src.typeCounter.getValues();
         settings_counterOriginalType_cb.setItems(FXCollections.observableArrayList(typeCounter));
@@ -174,6 +179,14 @@ public class MainController implements Initializable {
             String item_str = item.getValue();
             return item_str;
         }
+    }
+
+    private boolean isDeleteOldOriginal() {
+        return settings_deleteOldOriginal_cb.isSelected();
+    }
+
+    private boolean isDeleteOldCopied() {
+        return settings_deleteOldCopied_cb.isSelected();
     }
 
     private String getNameOriginal() {
@@ -262,6 +275,9 @@ public class MainController implements Initializable {
         boolean isLaunch = isLaunch();
         boolean isLaunchCopied = isLaunchCopied();
 
+        boolean isDeleteOriginal = isDeleteOldOriginal();
+        boolean isDeleteCopied = isDeleteOldCopied();
+
         builder.setCatalogPath(catalog)
                 .setLastFocusFile(lastFocusFile)
                 .setNameOriginal(nameOriginal)
@@ -272,7 +288,10 @@ public class MainController implements Initializable {
                 .setNameCopied(nameCopied)
                 .setCopiedCounter(isCounterCopied, counterCopied_type, counterCopiedLastValue)
                 .setLaunch(isLaunch)
-                .setLaunchCopied(isLaunchCopied);
+                .setLaunchCopied(isLaunchCopied)
+                .setDeleteOriginal(isDeleteOriginal)
+                .setDeleteCopied(isDeleteCopied)
+        ;
 
         Settings settings = builder.build();
         return settings;
@@ -329,8 +348,11 @@ public class MainController implements Initializable {
         TreeItem<String> item = new TreeItem<>(file.getName());
 
         if (file.isDirectory()) {
-            for (File children : file.listFiles()) {
-                item.getChildren().add(getNodeForTreeFiles(children));
+            File listFiles[] = file.listFiles();
+            if (listFiles != null) {
+                for (File children : listFiles) {
+                    item.getChildren().add(getNodeForTreeFiles(children));
+                }
             }
         }
 
@@ -342,14 +364,13 @@ public class MainController implements Initializable {
         if (file != null) {
             String rootFolder_newValue = file.getAbsolutePath();
             catalogProperty.setValue(rootFolder_newValue);
-            Configuration.setLastFolder(rootFolder_newValue);
         }
 
         //update tree
     }
 
     public void clickOnCompile() {
-        System.out.println("compile");
+
         boolean b = isError();
         if (!b) {
             Settings settings = collectSettings();
@@ -358,12 +379,18 @@ public class MainController implements Initializable {
 
             if (settings.isSaveOriginal()) {
                 String path_forOriginalExe = settings.getPathForOriginalExe();
+                if (settings.isDeleteOriginal()) {
+                    Catalog.deleteFile(path_forOriginalExe);
+                }
                 console.exec_createExe(pathSource, path_forOriginalExe);
                 processIsCompleted(console.getLastExecCommand());
             }
 
             if (settings.isSaveCopied()) {
                 String path_forCopiedExe = settings.getPathForCopiedExe();
+                if (settings.isDeleteCopied()) {
+                    Catalog.deleteFile(path_forCopiedExe);
+                }
                 console.exec_createExe(pathSource, path_forCopiedExe);
                 processIsCompleted(console.getLastExecCommand());
             }
@@ -381,26 +408,9 @@ public class MainController implements Initializable {
             }
 
             console.close();
-        }
-//        String path = catalogProperty.getValue() + "/";
-//        //path = path.replaceAll(" ", "\\\\\\\\ ");
-//        String file_name = getItem_str();
-//        String file_name_sh = file_name.substring(0, file_name.length()-2);
-//
-//
-//        Console console = new Console();
-//        console.exec("i686-w64-mingw32-gcc " + path + file_name +"  -o " + path + file_name_sh + ".exe");
-//        processIsCompleted(console.getLastExecCommand());
-//        refreshTreeFiles();
-//
-//        if (launch_cb.isSelected()) {
-//            console.exec("wine " + path + file_name_sh + ".exe");
-//            processIsCompleted(console.getLastExecCommand());
-//        }
-//
-//        console.close();
 
-        //console.exec("i686-w64-mingw32-gcc FirstBlood.c -o FirstBlood.exe");
+            Configuration.setSettings(settings);
+        }
     }
 
     private ArrayList<String> getErrors() {
@@ -464,7 +474,13 @@ public class MainController implements Initializable {
     }
 
     public void clickOnOpenPathCopiedCatalog() {
-        System.out.println("clickOnOpenPathCopiedCatalog");
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File file = directoryChooser.showDialog(new Stage());
+        if (file!=null) {
+            if (file.exists()) {
+                catalogCopiedProperty.setValue(file.getAbsolutePath());
+            }
+        }
     }
 
     public void clickOnAutogenerateName_copied() {
@@ -474,5 +490,48 @@ public class MainController implements Initializable {
     public void clickOnLikeTheOriginal_copied() {
         System.out.println("clickOnLikeTheOriginal_copied");
     }
+
+    public void setSettings(Settings settings) {
+
+        catalogProperty.setValue(settings.getCatalogPath());
+
+        if (settings.getLastFocusFile() != null) {
+            selectFile(settings.getLastFocusFile());
+        }
+
+
+        settings_nameOriginal_tf.setText(settings.getNameOriginal());
+        settings_nameCopied_tf.setText(settings.getNameCopied());
+
+        settings_counterOriginal_cb.setSelected(settings.getOriginalCounter().isExist());
+        settings_counterOriginalType_cb.getSelectionModel().select(settings.getOriginalCounter().getType());
+        settings_counterOriginalLastValue_tf.setText(settings.getOriginalCounter().getLastValue());
+
+        catalogCopiedProperty.setValue(settings.getCatalogCopiedPath());
+        settings_counterCopied_cb.setSelected(settings.getCopiedCounter().isExist());
+        settings_counterCopiedType_cb.getSelectionModel().select(settings.getCopiedCounter().getType());
+        settings_counterCopiedLastValue_tf.setText(settings.getCopiedCounter().getLastValue());
+
+        settings_notSaveInThisCatalog_cb.setSelected(!settings.isSaveOriginal());
+        settings_createCopy_cb.setSelected(settings.isSaveCopied());
+
+        settings_deleteOldOriginal_cb.setSelected(settings.isDeleteOriginal());
+        settings_deleteOldCopied_cb.setSelected(settings.isDeleteCopied());
+
+        settings_launch_cb.setSelected(settings.isLaunch());
+        settings_launchCopy_cb.setSelected(settings.isLaunchCopied());
+
+
+    }
+
+    private void selectFile(String fileName) {
+        TreeItem<String> root = treeFiles_tv.getRoot();
+        for (TreeItem node : root.getChildren()) {
+            if (node.getValue().equals(fileName)) {
+                treeFiles_tv.getSelectionModel().select(node);
+            }
+        }
+    }
+
 
 }

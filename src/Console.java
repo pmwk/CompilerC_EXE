@@ -26,6 +26,7 @@ public class Console {
     public void exec_createExe(String pathSource, String pathResult) {
         // " + path + file_name +"  -o " + path + file_name_sh + ".exe
         exec("i686-w64-mingw32-gcc " + pathSource + " -o " + pathResult);
+        //exec("g++ " + pathSource + " -o " + pathResult);
     }
 
     public void exec_launch(String path) {

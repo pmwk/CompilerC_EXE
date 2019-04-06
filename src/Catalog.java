@@ -16,6 +16,13 @@ public class Catalog {
         }
     }
 
+    public static void deleteFile(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
     public static <T> T getNext_counter(typeCounter typeC, T last_value ) {
         if (last_value.getClass() == String.class) {
             char chars[] = ((String)last_value).toCharArray();

@@ -1,10 +1,31 @@
 package src;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Settings {
+public class Settings implements Serializable {
 
     public final static String types_counter[] = {"str", "number"};
+
+    public Settings() {
+        catalogPath = "/home/kanumba/Рабочий\\ стол/";
+        lastFocusFile = null;
+
+        nameOriginal = "";
+        originalCounter = new Counter(false, typeCounter.getValues()[0], "");
+        isSaveOriginal = true;
+
+        isSaveCopied = false;
+        catalogCopiedPath = "/";
+        nameCopied = "";
+        copiedCounter = new Counter(false, typeCounter.getValues()[0], "");
+
+        isDeleteOriginal = false;
+        isDeleteCopied = false;
+
+        isLaunch = false;
+        isLaunchCopied = false;
+    }
 
     private String catalogPath;
     private String lastFocusFile;
@@ -16,6 +37,29 @@ public class Settings {
     private boolean isSaveCopied;
     private String catalogCopiedPath;
     private String nameCopied;
+    private Counter copiedCounter;
+
+    private boolean isDeleteOriginal;
+    private boolean isDeleteCopied;
+
+    private boolean isLaunch;
+    private boolean isLaunchCopied;
+
+    public boolean isDeleteOriginal() {
+        return isDeleteOriginal;
+    }
+
+    public void setDeleteOriginal(boolean deleteOriginal) {
+        isDeleteOriginal = deleteOriginal;
+    }
+
+    public boolean isDeleteCopied() {
+        return isDeleteCopied;
+    }
+
+    public void setDeleteCopied(boolean deleteCopied) {
+        isDeleteCopied = deleteCopied;
+    }
 
     public String getNameCopied() {
         return nameCopied;
@@ -24,11 +68,6 @@ public class Settings {
     public void setNameCopied(String nameCopied) {
         this.nameCopied = nameCopied;
     }
-
-    private Counter copiedCounter;
-
-    private boolean isLaunch;
-    private boolean isLaunchCopied;
 
     public String getCatalogPath() {
         return catalogPath;
@@ -178,12 +217,22 @@ public class Settings {
             return this;
         }
 
+        public settingsBuilder setDeleteOriginal (boolean b) {
+            settings.setDeleteOriginal(b);
+            return this;
+        }
+
+        public settingsBuilder setDeleteCopied(boolean b) {
+            settings.setDeleteCopied(b);
+            return this;
+        }
+
         public Settings build() {
             return settings;
         }
     }
 
-    static class Counter {
+    static class Counter implements Serializable {
         boolean isExist;
         typeCounter type;
         String lastValue;
@@ -259,7 +308,9 @@ public class Settings {
                 } else {
                     name += ".exe";
                     if (Catalog.isExistFile(catalogPath + "/" + name)) {
-                        list.add("The resulting file is already in the directory ["  + catalogPath + "/" + name + "]" );
+                        if (!isDeleteOriginal) {
+                            list.add("The resulting file is already in the directory ["  + catalogPath + "/" + name + "]" );
+                        }
                     }
                 }
 
@@ -279,7 +330,9 @@ public class Settings {
                     } else {
                         nameC += ".exe";
                         if (Catalog.isExistFile(catalogCopiedPath + "/" + nameC)) {
-                            list.add("The resulting file (copied) is already in the directory [" + catalogCopiedPath + "/" + nameC +"]");
+                            if (!isDeleteCopied) {
+                                list.add("The resulting file (copied) is already in the directory [" + catalogCopiedPath + "/" + nameC +"]");
+                            }
                         }
                     }
                 }
